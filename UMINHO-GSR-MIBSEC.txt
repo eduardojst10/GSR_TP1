@@ -1,0 +1,202 @@
+UMINHO-GSR-MIBSEC DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Opaque,
+	TimeTicks
+		FROM SNMPv2-SMI
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+uminhoMIBSecMIB MODULE-IDENTITY
+	LAST-UPDATED "202204271125Z"	-- Apr 27, 2022, 11:25:00 AM
+	ORGANIZATION 
+	CONTACT-INFO
+		""
+	DESCRIPTION
+		""
+	REVISION "202204271125Z"	-- Apr 27, 2022, 11:25:00 AM
+	DESCRIPTION
+		"Initial version."
+	-- 1.3.6.1.4.1.100
+::= { enterprises 100 }
+
+
+operTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF OperTableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Operations table requested from managers"
+	-- 1.3.6.1.4.1.100.8
+	::= { uminhoMIBSecMIB 8 }
+
+
+operTableEntry OBJECT-TYPE
+	SYNTAX  OperTableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Entry of Operations table requested from managers"
+	INDEX {
+		idOper }
+	-- 1.3.6.1.4.1.100.8.1
+	::= { operTable 1 }
+
+
+OperTableEntry ::= SEQUENCE {
+
+	idOper     INTEGER,
+	typeOper   OCTET STRING,
+	idSource   OCTET STRING,
+	idDest     OCTET STRING,
+	oidArg     OBJECT IDENTIFIER,
+	valueArg   Opaque,
+	typeArg    OCTET STRING,
+	sizeArg    BITS,
+	ttlOper    TimeTicks,
+	statusOper INTEGER }
+
+
+idOper OBJECT-TYPE
+	SYNTAX  INTEGER (1..300000 | 0)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Operation id"
+	-- 1.3.6.1.4.1.100.8.1.1
+	::= { operTableEntry 1 }
+
+
+typeOper OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Operation type"
+	-- 1.3.6.1.4.1.100.8.1.2
+	::= { operTableEntry 2 }
+
+
+idSource OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Source id - id from manager"
+	-- 1.3.6.1.4.1.100.8.1.3
+	::= { operTableEntry 3 }
+
+
+idDest OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Destination id - id from requested mib object agent"
+	-- 1.3.6.1.4.1.100.8.1.4
+	::= { operTableEntry 4 }
+
+
+oidArg OBJECT-TYPE
+	SYNTAX  OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"OID from argument"
+	-- 1.3.6.1.4.1.100.8.1.5
+	::= { operTableEntry 5 }
+
+
+valueArg OBJECT-TYPE
+	SYNTAX  Opaque
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Argument value - this value is altered when, eventually ,the operation is done and we get the value"
+	-- 1.3.6.1.4.1.100.8.1.6
+	::= { operTableEntry 6 }
+
+
+typeArg OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Argument type, given in initial request"
+	-- 1.3.6.1.4.1.100.8.1.7
+	::= { operTableEntry 7 }
+
+
+sizeArg OBJECT-TYPE
+	SYNTAX  BITS
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Size of argument, usually in bytes"
+	-- 1.3.6.1.4.1.100.8.1.8
+	::= { operTableEntry 8 }
+
+
+ttlOper OBJECT-TYPE
+	SYNTAX  TimeTicks
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Timeticks of operation"
+	-- 1.3.6.1.4.1.100.8.1.9
+	::= { operTableEntry 9 }
+
+
+statusOper OBJECT-TYPE
+	SYNTAX  INTEGER (0..4 | 0)
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Operation status, integer between 0 and 4."
+	-- 1.3.6.1.4.1.100.8.1.10
+	::= { operTableEntry 10 }
+
+
+
+uminhoMIBSec NOTIFICATION-TYPE
+	OBJECTS {
+		idOper}
+	STATUS  current
+	DESCRIPTION
+		"Notification events"
+	-- 1.3.6.1.4.1.100.6
+::= { uminhoMIBSecMIB 6 }
+
+usersMIBSecBasicGroup OBJECT-GROUP
+	OBJECTS {
+		idOper,
+		typeOper,
+		idSource,
+		idDest,
+		oidArg,
+		valueArg,
+		typeArg,
+		sizeArg,
+		ttlOper,
+		statusOper }
+	STATUS  current
+	DESCRIPTION
+		"Basic objects"
+	-- 1.3.6.1.4.1.100.5
+::= { uminhoMIBSecMIB 5 }
+
+uminhoMIBSecEvents NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		uminhoMIBSec }
+	STATUS  current
+	DESCRIPTION
+		"Basic notifications"
+	-- 1.3.6.1.4.1.100.7
+::= { uminhoMIBSecMIB 7 }
+
+END
